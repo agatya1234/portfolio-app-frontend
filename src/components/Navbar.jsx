@@ -1,17 +1,12 @@
 import { Link } from "react-router-dom";
-import {
-  MdOutlineAccountBalanceWallet,
-  MdOutlineNotifications,
-  MdOutlineShoppingCart,
-} from "react-icons/md";
 import { FaRegUserCircle } from "react-icons/fa";
 
 export const Navbar = () => {
   return (
-    <nav className="bg-gray-800 text-white w-full shadow-md border-b">
+    <nav className="bg-gray-600 text-white w-full shadow-md">
       <div className="container mx-auto px-4 flex justify-between items-center py-3">
         <Link to="/" className="text-2xl font-bold cursor-pointer">
-          StockAPP{" "}
+          Portfolio Tracker{" "}
         </Link>
 
         <div className="hidden md:flex space-x-6">
@@ -34,21 +29,11 @@ export const Navbar = () => {
 
         {/* Icons */}
         <div className="flex items-center space-x-4">
-          <Link to="/" className="hover:text-gray-300 text-xl">
-            <MdOutlineNotifications />
-          </Link>
-          <Link to="/" className="hover:text-gray-300 text-xl">
-            <MdOutlineAccountBalanceWallet />
-          </Link>
-          <Link to="/" className="hover:text-gray-300 text-xl">
-            <MdOutlineShoppingCart />
-          </Link>
-
           {/* User Profile */}
           <div className="relative">
             <button className="flex items-center space-x-2 hover:text-gray-300">
-              <FaRegUserCircle />
-              <span>User</span>
+              <FaRegUserCircle style={{ height: 30, width: 30 }} />
+              <span>William Serif</span>
             </button>
           </div>
         </div>

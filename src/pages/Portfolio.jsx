@@ -32,7 +32,7 @@ export const Portfolio = () => {
         setLoading(false);
       }
     };
-    loadData();
+    // loadData();
   }, []);
 
   useEffect(() => {
