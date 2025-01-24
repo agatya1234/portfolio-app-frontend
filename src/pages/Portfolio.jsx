@@ -1,10 +1,20 @@
 import React, { useEffect, useState } from "react";
-import { fetchStockData } from "../API/stockService";
+import {
+  deleteStock,
+  getPortfolioStocks,
+  updateStock,
+} from "../API/stockService";
+import ClipLoader from "react-spinners/ClipLoader";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export const Portfolio = () => {
   const [stocks, setStocks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [currentStock, setCurrentStock] = useState(null);
 
   // Sample user portfolio data
   const userPortfolio = [
@@ -19,63 +29,106 @@ export const Portfolio = () => {
     pnlToday: 0,
   });
 
+  // useEffect(() => {
+  //   const calculatePortfolioData = () => {
+  //     let invested = 0;
+  //     let current = 0;
+  //     let pnlTotal = 0;
+  //     let pnlToday = 0;
+
+  //     userPortfolio.forEach((portfolioItem) => {
+  //       const stock = stocks.find((s) => s.symbol === portfolioItem.symbol);
+  //       if (stock) {
+  //         const stockCurrentPrice = stock.regularMarketPrice;
+  //         const stockChange = stock.regularMarketChange;
+
+  //         invested += portfolioItem.invested;
+  //         current += stockCurrentPrice * portfolioItem.quantity;
+  //         pnlTotal +=
+  //           stockCurrentPrice * portfolioItem.quantity - portfolioItem.invested;
+  //         pnlToday += stockChange * portfolioItem.quantity;
+  //       }
+  //     });
+
+  //     setPortfolioData({
+  //       invested,
+  //       current,
+  //       pnlTotal,
+  //       pnlToday,
+  //     });
+  //   };
+
+  //   calculatePortfolioData();
+  // }, [stocks]);
+
+  const fetchPortfolioStocks = async () => {
+    try {
+      setLoading(true);
+      const data = await getPortfolioStocks();
+      setStocks(data.data);
+      setLoading(false);
+      toast.success("Stock Fetched successfully!");
+    } catch (error) {
+      setLoading(false);
+      toast.error("Failed to fetch stocks!");
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchStockData();
-        console.log("API Response:", data.body);
-        setStocks(data.body || []);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching stock data:", error);
-        setError("Failed to load stock data.");
-        setLoading(false);
-      }
-    };
-    // loadData();
+    fetchPortfolioStocks();
   }, []);
 
-  useEffect(() => {
-    const calculatePortfolioData = () => {
-      let invested = 0;
-      let current = 0;
-      let pnlTotal = 0;
-      let pnlToday = 0;
+  const handleEdit = (stock) => {
+    setCurrentStock(stock);
+    setShowEditModal(true);
+  };
 
-      userPortfolio.forEach((portfolioItem) => {
-        const stock = stocks.find((s) => s.symbol === portfolioItem.symbol);
-        if (stock) {
-          const stockCurrentPrice = stock.regularMarketPrice;
-          const stockChange = stock.regularMarketChange;
+  const handleDelete = (stock) => {
+    setCurrentStock(stock);
+    setShowDeleteConfirm(true);
+  };
 
-          invested += portfolioItem.invested;
-          current += stockCurrentPrice * portfolioItem.quantity;
-          pnlTotal +=
-            stockCurrentPrice * portfolioItem.quantity - portfolioItem.invested;
-          pnlToday += stockChange * portfolioItem.quantity;
-        }
-      });
+  const confirmDelete = async () => {
+    try {
+      setStocks(stocks.filter((s) => s.ticker !== currentStock.ticker));
+      const data = await deleteStock(currentStock._id);
+      setShowDeleteConfirm(false);
+      toast.success("Stock deleted successfully!");
+      setCurrentStock(null);
+    } catch (error) {
+      toast.error("Failed to delete the stock!");
+    }
+  };
 
-      setPortfolioData({
-        invested,
-        current,
-        pnlTotal,
-        pnlToday,
-      });
-    };
+  const saveEdit = async () => {
+    try {
+      console.log("current stoc -->", currentStock);
+      const data = await updateStock(currentStock._id, currentStock.quantity);
+      setStocks(
+        stocks.map((s) => (s.ticker === currentStock.ticker ? currentStock : s))
+      );
+      setShowEditModal(false);
+      toast.success("Stock Updated successfully!");
+      setCurrentStock(null);
+    } catch (error) {
+      toast.error("Failed to Update Successfully!");
+    }
+  };
 
-    calculatePortfolioData();
-  }, [stocks]);
-
-  if (loading) return <div className="text-center mt-10">Loading...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen bg-gray-800 text-white">
+        <ClipLoader color="#ffffff" size={50} />
+      </div>
+    );
   if (error)
     return <div className="text-center mt-10 text-red-500">{error}</div>;
 
   return (
     <div className="p-6 bg-gray-800 text-white h-screen">
-      <h1 className="mb-6 italic underline">Portfolio :</h1>
-
       {/* Portfolio */}
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="mb-6  p-2 flex justify-between items-center shadow-md">
         <div className="mb-4  px-4 py-2 border rounded-md shadow-md w-1/6">
           <div className="text-lg font-semibold">Invested Total:</div>
@@ -107,71 +160,140 @@ export const Portfolio = () => {
         </div>
       </div>
 
-      {/* Stock List */}
+      {/* Stock Holdings */}
+      <h2 className="text-2xl font-bold mb-4">Stock Holdings</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-gray-900 shadow-md rounded-lg">
           <thead>
             <tr className="bg-gray-700 text-gray-200 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">Ticker</th>
-              <th className="py-3 px-6 text-right">Invested Amount</th>
-              <th className="py-3 px-6 text-right">Current Price</th>
-              <th className="py-3 px-6 text-right">Change</th>
-              <th className="py-3 px-6 text-right">% Change</th>
-              <th className="py-3 px-6 text-right">P&L Today</th>
+              <th className="py-3 px-6 text-left">Stock Name</th>
+              <th className="py-3 px-6 text-right">Ticker</th>
+              <th className="py-3 px-6 text-right">Quantity</th>
+              <th className="py-3 px-6 text-right">Buy Price</th>
+              <th className="py-3 px-6 text-center">Actions</th>
             </tr>
           </thead>
           <tbody className="text-gray-300 text-sm font-light">
-            {userPortfolio.map((portfolioItem, index) => {
-              const stock = stocks.find(
-                (s) => s.symbol === portfolioItem.symbol
-              );
-              if (!stock) return null;
-
-              const stockCurrentPrice = stock.regularMarketPrice;
-              const stockChange = stock.regularMarketChange;
-              const stockChangePercent = stock.regularMarketChangePercent;
-
-              return (
-                <tr
-                  key={index}
-                  className="border-b border-gray-700 hover:bg-gray-600"
-                >
-                  <td className="py-3 px-6 text-left">
-                    {portfolioItem.symbol}
-                  </td>
-                  <td className="py-3 px-6 text-right">
-                    ${portfolioItem.invested.toFixed(2)}
-                  </td>
-                  <td className="py-3 px-6 text-right">
-                    ${stockCurrentPrice.toFixed(2)}
-                  </td>
-                  <td
-                    className={`py-3 px-6 text-right ${
-                      stockChange < 0 ? "text-red-500" : "text-green-500"
-                    }`}
+            {stocks.map((stock, index) => (
+              <tr
+                key={index}
+                className="border-b border-gray-700 hover:bg-gray-600"
+              >
+                <td className="py-3 px-6 text-left">{stock.name}</td>
+                <td className="py-3 px-6 text-right">{stock.ticker}</td>
+                <td className="py-3 px-6 text-right">{stock.quantity}</td>
+                <td className="py-3 px-6 text-right">${stock.buyPrice}</td>
+                <td className="py-3 px-6 text-center">
+                  <button
+                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2"
+                    onClick={() => handleEdit(stock)}
                   >
-                    ${stockChange.toFixed(2)}
-                  </td>
-                  <td
-                    className={`py-3 px-6 text-right ${
-                      stockChangePercent < 0 ? "text-red-500" : "text-green-500"
-                    }`}
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                    onClick={() => handleDelete(stock)}
                   >
-                    {stockChangePercent.toFixed(2)}%
-                  </td>
-                  <td
-                    className={`py-3 px-6 text-right ${
-                      stockChange < 0 ? "text-red-500" : "text-green-500"
-                    }`}
-                  >
-                    ${stockChange * portfolioItem.quantity}
-                  </td>
-                </tr>
-              );
-            })}
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
+      {/* Edit Modal */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg max-w-full w-[400px]">
+            <h3 className="text-xl font-bold mb-4">Edit Stock</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-2">
+                Stock Name
+              </label>
+              <input
+                type="text"
+                value={currentStock?.name}
+                disabled
+                className="w-full px-3 py-2 bg-gray-700 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-2">
+                Buy Price
+              </label>
+              <input
+                disabled
+                type="number"
+                value={currentStock?.buyPrice}
+                onChange={(e) =>
+                  setCurrentStock({
+                    ...currentStock,
+                    buyPrice: Number(e.target.value),
+                  })
+                }
+                className="w-full px-3 py-2 bg-gray-700 rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-sm font-semibold mb-2">
+                Quantity
+              </label>
+              <input
+                type="number"
+                min={1}
+                value={currentStock?.quantity}
+                onChange={(e) =>
+                  setCurrentStock({
+                    ...currentStock,
+                    quantity: Number(e.target.value),
+                  })
+                }
+                className="w-full px-3 py-2 bg-gray-700 rounded"
+              />
+            </div>
+            <div className="flex justify-end">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                onClick={saveEdit}
+              >
+                Save
+              </button>
+              <button
+                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setShowEditModal(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl font-bold mb-4">
+              Are you sure you want to delete {currentStock?.ticker}?
+            </h3>
+            <div className="flex justify-end">
+              <button
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded mr-2"
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
+              <button
+                className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

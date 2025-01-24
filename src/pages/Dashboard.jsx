@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { fetchStockData } from "../API/stockService";
+import { addStock, fetchStockData } from "../API/stockService";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import ClipLoader from "react-spinners/ClipLoader";
 
 export const Dashboard = () => {
   const [stocks, setStocks] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedStock, setSelectedStock] = useState({
@@ -13,19 +16,21 @@ export const Dashboard = () => {
     buyPrice: "",
   });
 
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchStockData();
+      setStocks(data.body || []);
+      toast.success("Stocks Fetched successfully!");
+      setLoading(false);
+    } catch (error) {
+      setError("Failed to load stock data.");
+      toast.error("Failed to load stock data.");
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchStockData();
-        console.log("API Response:", data.body);
-        setStocks(data.body || []);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching stock data:", error);
-        setError("Failed to load stock data.");
-        setLoading(false);
-      }
-    };
     loadData();
   }, []);
 
@@ -46,10 +51,26 @@ export const Dashboard = () => {
     setSelectedStock((prev) => ({ ...prev, [name]: value }));
   };
 
+  const addStockToPortfolio = async () => {
+    try {
+      setLoading(true);
+      const data = await addStock(selectedStock);
+      toast.success("Stock Added successfully!");
+      closeModal();
+      setLoading(false);
+    } catch (error) {
+      console.error("Error adding stock", error);
+      setError("Failed to load stock data.");
+      toast.error("Failed to add stock.");
+      closeModal();
+      setLoading(false);
+    }
+  };
+
   if (loading)
     return (
-      <div className="text-center text-white h-screen bg-gray-800 pt-80">
-        Loading...
+      <div className="flex justify-center items-center h-screen bg-gray-800 text-white">
+        <ClipLoader color="#ffffff" size={50} />
       </div>
     );
   if (error)
@@ -59,6 +80,7 @@ export const Dashboard = () => {
 
   return (
     <div className="p-6 bg-gray-800 text-white h-screen">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="overflow-x-auto">
         <table className="min-w-full bg-gray-900 shadow-md rounded-lg">
           <thead>
@@ -157,6 +179,7 @@ export const Dashboard = () => {
                 <input
                   type="number"
                   name="quantity"
+                  min={1}
                   value={selectedStock.quantity}
                   onChange={handleChange}
                   className="w-full px-4 py-2 bg-gray-800 text-white rounded border border-gray-700"
@@ -184,6 +207,7 @@ export const Dashboard = () => {
                 </button>
                 <button
                   type="submit"
+                  onClick={() => addStockToPortfolio()}
                   className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
                 >
                   Add Stock
