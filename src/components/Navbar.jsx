@@ -3,7 +3,7 @@ import { FaRegUserCircle } from "react-icons/fa";
 
 export const Navbar = () => {
   return (
-    <nav className="bg-gray-600 text-white w-full shadow-md">
+    <nav className="bg-gray-600 text-white w-full shadow-md sticky top-0">
       <div className="container mx-auto px-4 flex justify-between items-center py-3">
         <Link to="/" className="text-2xl font-bold cursor-pointer">
           Portfolio Tracker{" "}

@@ -7,6 +7,7 @@ import {
 import ClipLoader from "react-spinners/ClipLoader";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { PortfolioChart } from "../components/PortfolioChart";
 
 export const Portfolio = () => {
   const [stocks, setStocks] = useState([]);
@@ -103,7 +104,6 @@ export const Portfolio = () => {
 
   const saveEdit = async () => {
     try {
-      console.log("current stoc -->", currentStock);
       const data = await updateStock(currentStock._id, currentStock.quantity);
       setStocks(
         stocks.map((s) => (s.ticker === currentStock.ticker ? currentStock : s))
@@ -129,39 +129,43 @@ export const Portfolio = () => {
     <div className="p-6 bg-gray-800 text-white h-screen">
       {/* Portfolio */}
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="mb-6  p-2 flex justify-between items-center shadow-md">
-        <div className="mb-4  px-4 py-2 border rounded-md shadow-md w-1/6">
-          <div className="text-lg font-semibold">Invested Total:</div>
-          <div className="text-lg">${portfolioData.invested.toFixed(2)}</div>
-        </div>
-        <div className=" mb-4 px-4 py-2 border rounded-md shadow-md w-1/6">
-          <div className="text-lg font-semibold">Current Value:</div>
-          <div className="text-lg">${portfolioData.current.toFixed(2)}</div>
-        </div>
-        <div className=" mb-4 px-4 py-2 border rounded-md shadow-md w-1/6">
-          <div className="text-lg font-semibold">Total P&L:</div>
-          <div
-            className={`text-lg ${
-              portfolioData.pnlTotal >= 0 ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            ${portfolioData.pnlTotal.toFixed(2)}
+
+      <div className="mb-6 p-6 flex gap-56 items-start bg-gray-800 rounded-lg">
+        {/* Left Column: Values */}
+        <div className="flex flex-col gap-4 w-1/3">
+          <div className="px-4 py-2 border rounded-md shadow-md bg-gray-700">
+            <div className="text-lg font-semibold text-white">
+              Invested Total:
+            </div>
+            <div className="text-lg text-gray-300">
+              ${portfolioData.invested.toFixed(2)}
+            </div>
+          </div>
+          <div className="px-4 py-2 border rounded-md shadow-md bg-gray-700">
+            <div className="text-lg font-semibold text-white">
+              Current Value:
+            </div>
+            <div className="text-lg text-gray-300">
+              ${portfolioData.current.toFixed(2)}
+            </div>
+          </div>
+          <div className="px-4 py-2 border rounded-md shadow-md bg-gray-700">
+            <div className="text-lg font-semibold text-white">Total P&L:</div>
+            <div
+              className={`text-lg ${
+                portfolioData.pnlTotal >= 0 ? "text-green-500" : "text-red-500"
+              }`}
+            >
+              ${portfolioData.pnlTotal.toFixed(2)}
+            </div>
           </div>
         </div>
-        <div className=" mb-4 px-4 py-2 border rounded-md shadow-md w-1/6">
-          <div className="text-lg font-semibold">P&L Today:</div>
-          <div
-            className={`text-lg ${
-              portfolioData.pnlToday >= 0 ? "text-green-500" : "text-red-500"
-            }`}
-          >
-            ${portfolioData.pnlToday.toFixed(2)}
-          </div>
-        </div>
+
+        {/* Right Column: Chart */}
+        <PortfolioChart stocks={stocks} />
       </div>
 
       {/* Stock Holdings */}
-      <h2 className="text-2xl font-bold mb-4">Stock Holdings</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full bg-gray-900 shadow-md rounded-lg">
           <thead>
