@@ -27,46 +27,16 @@ export const Portfolio = () => {
     invested: 0,
     current: 0,
     pnlTotal: 0,
-    pnlToday: 0,
+    topPerformingStock: 0,
   });
-
-  // useEffect(() => {
-  //   const calculatePortfolioData = () => {
-  //     let invested = 0;
-  //     let current = 0;
-  //     let pnlTotal = 0;
-  //     let pnlToday = 0;
-
-  //     userPortfolio.forEach((portfolioItem) => {
-  //       const stock = stocks.find((s) => s.symbol === portfolioItem.symbol);
-  //       if (stock) {
-  //         const stockCurrentPrice = stock.regularMarketPrice;
-  //         const stockChange = stock.regularMarketChange;
-
-  //         invested += portfolioItem.invested;
-  //         current += stockCurrentPrice * portfolioItem.quantity;
-  //         pnlTotal +=
-  //           stockCurrentPrice * portfolioItem.quantity - portfolioItem.invested;
-  //         pnlToday += stockChange * portfolioItem.quantity;
-  //       }
-  //     });
-
-  //     setPortfolioData({
-  //       invested,
-  //       current,
-  //       pnlTotal,
-  //       pnlToday,
-  //     });
-  //   };
-
-  //   calculatePortfolioData();
-  // }, [stocks]);
 
   const fetchPortfolioStocks = async () => {
     try {
       setLoading(true);
       const data = await getPortfolioStocks();
+      console.log(data);
       setStocks(data.data);
+      setPortfolioData(data.portfolio);
       setLoading(false);
       toast.success("Stock Fetched successfully!");
     } catch (error) {
@@ -108,6 +78,7 @@ export const Portfolio = () => {
       setStocks(
         stocks.map((s) => (s.ticker === currentStock.ticker ? currentStock : s))
       );
+      await fetchPortfolioStocks();
       setShowEditModal(false);
       toast.success("Stock Updated successfully!");
       setCurrentStock(null);
@@ -132,7 +103,7 @@ export const Portfolio = () => {
 
       <div className="mb-6 p-6 flex gap-56 items-start bg-gray-800 rounded-lg">
         {/* Left Column: Values */}
-        <div className="flex flex-col gap-4 w-1/3">
+        <div className="flex flex-col gap-4 w-1/3  mr-40">
           <div className="px-4 py-2 border rounded-md shadow-md bg-gray-700">
             <div className="text-lg font-semibold text-white">
               Invested Total:
@@ -159,6 +130,18 @@ export const Portfolio = () => {
               ${portfolioData.pnlTotal.toFixed(2)}
             </div>
           </div>
+          <div className="px-4 py-2 border rounded-md shadow-md bg-gray-700">
+            <div className="text-lg font-semibold text-white">
+              Top Performing Stock
+            </div>
+            <div
+              className={`text-lg ${
+                portfolioData.pnlTotal >= 0 ? "text-green-500" : "text-red-500"
+              }`}
+            >
+              ${portfolioData.pnlTotal.toFixed(2)}
+            </div>
+          </div>
         </div>
 
         {/* Right Column: Chart */}
@@ -166,7 +149,7 @@ export const Portfolio = () => {
       </div>
 
       {/* Stock Holdings */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto rounded-lg ">
         <table className="min-w-full bg-gray-900 shadow-md rounded-lg">
           <thead>
             <tr className="bg-gray-700 text-gray-200 uppercase text-sm leading-normal">
@@ -177,32 +160,33 @@ export const Portfolio = () => {
               <th className="py-3 px-6 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="text-gray-300 text-sm font-light">
-            {stocks.map((stock, index) => (
-              <tr
-                key={index}
-                className="border-b border-gray-700 hover:bg-gray-600"
-              >
-                <td className="py-3 px-6 text-left">{stock.name}</td>
-                <td className="py-3 px-6 text-right">{stock.ticker}</td>
-                <td className="py-3 px-6 text-right">{stock.quantity}</td>
-                <td className="py-3 px-6 text-right">${stock.buyPrice}</td>
-                <td className="py-3 px-6 text-center">
-                  <button
-                    className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2"
-                    onClick={() => handleEdit(stock)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
-                    onClick={() => handleDelete(stock)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
+          <tbody className="text-gray-300 text-sm font-light rounded-lg ">
+            {stocks &&
+              stocks?.map((stock, index) => (
+                <tr
+                  key={index}
+                  className="border-b border-gray-700 hover:bg-gray-600"
+                >
+                  <td className="py-3 px-6 text-left">{stock.name}</td>
+                  <td className="py-3 px-6 text-right">{stock.ticker}</td>
+                  <td className="py-3 px-6 text-right">{stock.quantity}</td>
+                  <td className="py-3 px-6 text-right">${stock.buyPrice}</td>
+                  <td className="py-3 px-6 text-center">
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2"
+                      onClick={() => handleEdit(stock)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded"
+                      onClick={() => handleDelete(stock)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

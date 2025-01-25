@@ -8,11 +8,11 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 export const PortfolioChart = ({ stocks }) => {
   // Prepare data for the chart
   const chartData = {
-    labels: stocks.map((stock) => stock.name),
+    labels: stocks && stocks?.map((stock) => stock.name),
     datasets: [
       {
         label: "Stock Holdings",
-        data: stocks.map((stock) => stock.quantity),
+        data: stocks?.map((stock) => stock.quantity),
         backgroundColor: [
           "#FF6384",
           "#36A2EB",
@@ -52,8 +52,10 @@ export const PortfolioChart = ({ stocks }) => {
   };
 
   return (
-    <div className="p-6 rounded-lg shadow-lg w-[400px]">
-      <h3 className="text-xl font-bold text-white mb-4">Stock Holdings</h3>
+    <div className="p-6 rounded-lg shadow-lg w-[400px] ">
+      <h3 className="text-xl font-bold text-white mb-4 text-center">
+        Portfolio Distribution
+      </h3>
       <Pie data={chartData} options={options} />
     </div>
   );
