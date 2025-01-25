@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const Landing = () => {
   const navigate = useNavigate();
   const handleNavigate = () => {
-    navigate("/login"); // Replace '/login' with the route for your login/signup screen
+    navigate("/login");
   };
   return (
     <div className="bg-black h-screen p-6 text-white flex items-center justify-center">

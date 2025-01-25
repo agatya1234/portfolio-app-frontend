@@ -17,12 +17,6 @@ export const Portfolio = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [currentStock, setCurrentStock] = useState(null);
 
-  // Sample user portfolio data
-  const userPortfolio = [
-    { symbol: "AAPL", quantity: 10, invested: 2500 },
-    { symbol: "GOOG", quantity: 5, invested: 5000 },
-  ];
-
   const [portfolioData, setPortfolioData] = useState({
     invested: 0,
     current: 0,
@@ -42,7 +36,7 @@ export const Portfolio = () => {
     } catch (error) {
       setLoading(false);
       toast.error("Failed to fetch stocks!");
-      console.log(error);
+      setError("Failed to fetch stocks!");
     }
   };
 

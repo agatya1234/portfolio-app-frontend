@@ -5,14 +5,16 @@ function Login() {
   const [email, setEmail] = useState("test@gmailcom");
   const [password, setPassword] = useState("test@123");
   const navigate = useNavigate();
-  const handleLogin = () => {
+  const handleLogin = (e) => {
+    e.preventDefault(); // Prevent form submission
     navigate("/dashboard");
   };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-black">
       <div className="w-full max-w-md p-8 space-y-6 bg-gray-900 rounded-lg shadow-lg">
         <h2 className="text-2xl font-bold text-center text-white">Login</h2>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={handleLogin}>
           {/* Email Field */}
           <div>
             <label
@@ -28,6 +30,7 @@ function Login() {
               placeholder="Enter your email"
               required
               value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
           {/* Password Field */}
@@ -45,6 +48,7 @@ function Login() {
               placeholder="Enter your password"
               required
               value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
           {/* Remember Me and Forgot Password */}
@@ -61,14 +65,12 @@ function Login() {
             </a>
           </div>
           {/* Submit Button */}
-          <div>
-            <button
-              onClick={handleLogin}
-              className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
-            >
-              Login
-            </button>
-          </div>
+          <button
+            type="submit"
+            className="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring focus:ring-blue-300"
+          >
+            Login
+          </button>
         </form>
         {/* Register Link */}
         <p className="text-sm text-center text-gray-300">
