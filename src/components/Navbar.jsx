@@ -10,12 +10,12 @@ export const Navbar = () => {
         </Link>
 
         <div className="hidden md:flex space-x-6">
-          <a href="/dashboard" className="hover:text-gray-300">
+          <Link to="/dashboard" className="hover:text-gray-300">
             Dashboard
-          </a>
-          <a href="/portfolio" className="hover:text-gray-300">
+          </Link>
+          <Link to="/portfolio" className="hover:text-gray-300">
             Portfolio
-          </a>
+          </Link>
         </div>
 
         {/* Searchbar */}
