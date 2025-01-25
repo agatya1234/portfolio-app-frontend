@@ -103,7 +103,7 @@ export const Portfolio = () => {
               Invested Total:
             </div>
             <div className="text-lg text-gray-300">
-              ${portfolioData.invested.toFixed(2)}
+              ${portfolioData?.invested.toFixed(2)}
             </div>
           </div>
           <div className="px-4 py-2 border rounded-md shadow-md bg-gray-700">
@@ -111,17 +111,17 @@ export const Portfolio = () => {
               Current Value:
             </div>
             <div className="text-lg text-gray-300">
-              ${portfolioData.current.toFixed(2)}
+              ${portfolioData?.current.toFixed(2)}
             </div>
           </div>
           <div className="px-4 py-2 border rounded-md shadow-md bg-gray-700">
             <div className="text-lg font-semibold text-white">Total P&L:</div>
             <div
               className={`text-lg ${
-                portfolioData.pnlTotal >= 0 ? "text-green-500" : "text-red-500"
+                portfolioData?.pnlTotal >= 0 ? "text-green-500" : "text-red-500"
               }`}
             >
-              ${portfolioData.pnlTotal.toFixed(2)}
+              ${portfolioData?.pnlTotal.toFixed(2)}
             </div>
           </div>
           <div className="px-4 py-2 border rounded-md shadow-md bg-gray-700">
@@ -130,10 +130,10 @@ export const Portfolio = () => {
             </div>
             <div
               className={`text-lg ${
-                portfolioData.pnlTotal >= 0 ? "text-green-500" : "text-red-500"
+                portfolioData?.pnlTotal >= 0 ? "text-green-500" : "text-red-500"
               }`}
             >
-              ${portfolioData.pnlTotal.toFixed(2)}
+              ${portfolioData?.pnlTotal.toFixed(2)}
             </div>
           </div>
         </div>
@@ -161,10 +161,10 @@ export const Portfolio = () => {
                   key={index}
                   className="border-b border-gray-700 hover:bg-gray-600"
                 >
-                  <td className="py-3 px-6 text-left">{stock.name}</td>
-                  <td className="py-3 px-6 text-right">{stock.ticker}</td>
-                  <td className="py-3 px-6 text-right">{stock.quantity}</td>
-                  <td className="py-3 px-6 text-right">${stock.buyPrice}</td>
+                  <td className="py-3 px-6 text-left">{stock?.name}</td>
+                  <td className="py-3 px-6 text-right">{stock?.ticker}</td>
+                  <td className="py-3 px-6 text-right">{stock?.quantity}</td>
+                  <td className="py-3 px-6 text-right">${stock?.buyPrice}</td>
                   <td className="py-3 px-6 text-center">
                     <button
                       className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-3 rounded mr-2"
