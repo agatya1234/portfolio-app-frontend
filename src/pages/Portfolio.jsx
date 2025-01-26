@@ -130,10 +130,12 @@ export const Portfolio = () => {
             </div>
             <div
               className={`text-lg ${
-                portfolioData?.pnlTotal >= 0 ? "text-green-500" : "text-red-500"
+                portfolioData?.topPerformingStock >= 0
+                  ? "text-green-500"
+                  : "text-red-500"
               }`}
             >
-              ${portfolioData?.pnlTotal.toFixed(2)}
+              ${portfolioData?.topPerformingStock}
             </div>
           </div>
         </div>
