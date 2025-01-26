@@ -2,6 +2,12 @@
 
 An app where users can browse Stocks, purchase, sell, edit and delete stocks.
 
+## Visit the Live Website
+
+```bash
+ https://portfolio-tracker12.netlify.app
+```
+
 ## Development Setup
 
 1. Clone the repo.
